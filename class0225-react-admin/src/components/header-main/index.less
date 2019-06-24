@@ -1,0 +1,40 @@
+.header-main-top{
+  text-align: right;
+ line-height: 0;
+  padding:20px;
+  border-bottom: 1px solid #1DA57A;
+  font-size: 15px;
+}
+
+.header-main-left{
+  position: relative;
+  height:39px;
+  float: left;
+  font-size: 20px;
+  width:400px;
+  text-align: center;
+  line-height:40px;
+  &::after{
+    content:'';
+    position: absolute;
+    left: 50%;
+    bottom:-40px;
+    transform: translateX(-50%);
+    border-bottom: 20px solid transparent;
+    border-top: 20px solid #fff;
+    border-right: 20px solid transparent;
+    border-left: 20px solid transparent;
+  }
+}
+
+.header-main-right{
+  float: right;
+  height: 40px;
+  line-height: 40px;
+  padding-right: 30px;
+  img{
+    margin: 0 10px;
+    width: 30px;
+    height: 30px;
+  }
+}

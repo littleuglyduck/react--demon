@@ -1,41 +1,79 @@
 import React,{ Component } from 'react';
-
+import {reqLogin} from '../../api';
 import './index.less';
-import { Form, Icon, Input, Button,  } from 'antd';
+import { Form, Icon, Input, Button} from 'antd';
 
-import logo from './logo.png';
+import logo from '../../assets/images/logo.png';
 
 const Item = Form.Item;
 
 
+/*在工厂函数中父组件传给子组件的数据都在函数形参props中*/
+ function Login(props) {
 
- class Login extends Component{
 
-    login = (e) => {
-        e.preventDefault();
-        //用来检验表单并获取表单的值
-        this.props.form.validateFields((error,value)=>{
-           /* error 代表表单检验结果
-                null校验通过
-                {}检验失败
-            */
+    const login = (e) => {
+         e.preventDefault();
+         //用来检验表单并获取表单的值
+         props.form.validateFields(async (error, values) => {
+             /* error 代表表单检验结果
+                  null校验通过
+                  {}检验失败
+              */
 
-            if(!error){
-                //检验通过
-                const {username,password} = value;
+             if (!error) {
+                 //检验通过
+                 const {username, password} = values;
 
-                //发送请求，请求登录
-                console.log(username,password);
+                 //发送请求，请求登录
+                 // axios.post('./login',{username,password})
+                 /*.then((res)=>{
 
-            }else{
-                console.log('登录表单校验失败：',error);
+                     const {data} =res;
+                     console.log(data);
 
-            }
-        })
-    }
+                     if(data.status ===0){
+                         //请求成功，跳转到主页面Ad'min
+                         {/!*<Redirect to ="/" 推荐使用在render方法中*!/}
+                         {/!*this.props.history.push('/') 推荐使用在回调函数中*!/}
 
-    //自定义校验规则函数
-     validator = (rule,value,callback) =>{
+                         this.props.history.replace('/');
+                     }else{
+
+                         message.error(data.msg,2);
+
+                         //重置密码为空
+                         this.props.form.resetFields(['password']);
+                     }
+                 })*/
+                 /*  .catch((error) =>{
+                       //请求失败：网络错误，服务器内部错误等
+                       message.error('网络出现异常，请刷新重试',2)
+                       /!*重置密码为空*!/
+                    this.props.form.resetFields(['password']);
+                   })*/
+
+
+                 const result = await reqLogin(username, password);
+
+                 if (result) {
+                     props.history.replace('/');
+
+                 } else {
+                     props.form.resetFields(['password']);
+                 }
+
+
+             } else {
+                 console.log('登录表单校验失败：', error);
+
+             }
+         })
+     };
+
+    //校验规则函数有两种方式
+    //一种是自定义校验规则函数
+    const  validator = (rule,value,callback) =>{
 
 
         const name = rule.fullField === 'username'? '用户名':'密码';
@@ -47,19 +85,19 @@ const Item = Form.Item;
         }
         else if(value.length >15){
             callback(`${name}!必须小于15位`);
-        } else if(/[a-zA-Z_0-9]+$/.test(value)){
+        } else if(!/[a-zA-Z_0-9]+$/.test(value)){
             callback(`${name}只能包含英文字母，数字和下划线`);
         }else{
             callback();
         }
      }//
-    //    不传参代表校验通过，传参嗲表校验失败
+    //    不传参代表校验通过，传参代表校验失败
 
 
 
-    render(){
-        //get方法也是告诫组件
-        const {getFieldDecorator } = this.props.form;
+
+        //get方法也是高阶组件
+        const {getFieldDecorator } = props.form;
 
         return <div className='login'>
             <header className='login-header'>
@@ -68,9 +106,10 @@ const Item = Form.Item;
             </header>
             <section className="login-content">
                 <h2>用户登录</h2>
-                <Form onSubmit={this.login} className="login-form">
+                <Form onSubmit={login} className="login-form">
                     <Item>
                         {
+                            /*高阶函数的方式*/
                             getFieldDecorator(
                                 'username',
                                 {
@@ -95,7 +134,7 @@ const Item = Form.Item;
                                 {
                                     rules:[
                                         {
-                                            validator:this.validator
+                                            validator:validator
                                         }
                                     ]
                                 }
@@ -111,7 +150,7 @@ const Item = Form.Item;
                 </Form>
             </section>
         </div>
-    }
+
 }
 
 //返回值是个包装组件 <Form(Login)><Login><Form(login)>
